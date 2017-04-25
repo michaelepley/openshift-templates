@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+[ -v SPARK_HOME ] || { echo "SPARK_HOME is not set, but is required" && exit 1; }
+RESOURCES_DIR=$(dirname $0)
+
+cp $RESOURCES_DIR/entrypoint.sh /
+chmod +x /entrypoint.sh
+
+cp $RESOURCES_DIR/launch.sh $SPARK_HOME/bin/
+chmod +x $SPARK_HOME/bin/launch.sh
+
+# copy in live conf files
+cp $RESOURCES_DIR/spark-defaults.conf $SPARK_HOME/conf/
+cp $RESOURCES_DIR/log4j.properties $SPARK_HOME/conf/
+
+# SPARK_WORKER_DIR defaults to SPARK_HOME/work and is created on Worker startup if it does not exist. instead of making SPARK_HOME world writable, create SPARK_HOME/work.
+mkdir $SPARK_HOME/work
+chmod a+rwx $SPARK_HOME/work
+chmod -R a+rwX $SPARK_HOME
