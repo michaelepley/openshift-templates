@@ -1,4 +1,4 @@
-FROM       nexus
+FROM       java-openjdk
 MAINTAINER Michael Epley, michaelepley@gmail.com
 LABEL vendor=Sonatype com.sonatype.license="Apache License, Version 2.0" com.sonatype.name="Nexus Repository Manager OSS base image"
 
@@ -11,6 +11,9 @@ USER 0
 
 RUN yum install -y curl tar createrepo && yum clean all
 
+# would prefer user id 145242119
+RUN useradd -u 14524 -m -r -g 0 -G users -c nexus nexus
+RUN mkdir -p ${SONATYPE_WORK} && chmod -R g+w ${SONATYPE_WORK}
 RUN mkdir -p /opt/sonatype/nexus \
   && curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} | gunzip | tar x -C /tmp nexus-${NEXUS_VERSION} \
   && mv /tmp/nexus-${NEXUS_VERSION}/* /opt/sonatype/nexus/ \
